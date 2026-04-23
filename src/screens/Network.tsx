@@ -3,6 +3,7 @@ import { StyleSheet, Text, View, FlatList, TouchableOpacity, Platform, Alert } f
 import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 import { useStore } from '@store/index';
 import { startScanning, stopScanning, syncWithDevice } from '@modules/sync';
+import { startBleSyncService, stopBleSyncService } from '@modules/bluetooth/BleSyncService';
 import type { SyncPeer } from '../types';
 
 export function NetworkScreen() {
@@ -30,6 +31,7 @@ export function NetworkScreen() {
     }
 
     setIsSyncing(true);
+    startBleSyncService();
     startScanning(async (device) => {
       const peer: SyncPeer = {
         device_id: device.id,
@@ -49,6 +51,7 @@ export function NetworkScreen() {
 
     setTimeout(() => {
       stopScanning();
+      stopBleSyncService();
       setIsSyncing(false);
     }, 10_000);
   }, [requestBlePermissions, setIsSyncing, addPeer]);
