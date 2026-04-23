@@ -1,0 +1,43 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+android/app/build/
+ios/build/
+ios/Pods/
+*.ipa
+*.apk
+*.aab
+
+# Environment
+.env
+.env.local
+
+# Metro
+.metro-health-check*
+
+# Watchman
+.watchmanconfig
+
+# CocoaPods
+ios/Pods/
+
+# Xcode
+ios/*.xcworkspace
+ios/build
+DerivedData/
+*.pbxuser
+*.mode1v3
+*.mode2v3
+*.perspectivev3
+xcuserdata/
+
+# Android
+android/.gradle
+android/local.properties
+android/captures/
+.cxx/
+
+# Misc
+.DS_Store
+*.log

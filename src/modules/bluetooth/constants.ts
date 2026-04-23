@@ -1,0 +1,8 @@
+// UUIDs uniques pour le service MeshPost
+export const SERVICE_UUID = '12345678-1234-1234-1234-123456789012';
+export const CHAR_POST_IDS_UUID = '12345678-1234-1234-1234-123456789013';
+export const CHAR_POSTS_UUID = '12345678-1234-1234-1234-123456789014';
+
+export const SCAN_DURATION_MS = 10_000;
+export const CONNECT_TIMEOUT_MS = 15_000;
+export const SYNC_INTERVAL_MS = 60_000; // scan toutes les 60s
