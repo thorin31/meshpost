@@ -17,9 +17,9 @@ export function FeedScreen() {
   const navigation = useNavigation<any>();
   const { posts, setPosts, isSyncing } = useStore();
 
-  const refresh = useCallback(() => {
-    pruneOldPosts();
-    setPosts(getRecentPosts());
+  const refresh = useCallback(async () => {
+    await pruneOldPosts();
+    setPosts(await getRecentPosts());
   }, [setPosts]);
 
   useEffect(() => {

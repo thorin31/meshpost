@@ -24,7 +24,8 @@ export function OnboardingScreen() {
     try {
       const user = await createIdentity(name.trim());
       setUser(user);
-    } catch {
+    } catch (e) {
+      console.error('[Onboarding] createIdentity failed:', e);
       Alert.alert('Erreur', 'Impossible de créer votre profil.');
     } finally {
       setLoading(false);

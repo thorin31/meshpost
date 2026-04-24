@@ -1,34 +1,35 @@
-import { subtle } from 'react-native-quick-crypto';
+import nacl from 'tweetnacl';
+
+function bytesToHex(bytes: Uint8Array): string {
+  return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+function hexToBytes(hex: string): Uint8Array {
+  const bytes = new Uint8Array(hex.length / 2);
+  for (let i = 0; i < hex.length; i += 2) {
+    bytes[i / 2] = parseInt(hex.slice(i, i + 2), 16);
+  }
+  return bytes;
+}
+
+function stringToBytes(str: string): Uint8Array {
+  return new TextEncoder().encode(str);
+}
 
 export async function generateKeyPair(): Promise<{ publicKey: string; privateKey: string }> {
-  const keyPair = await subtle.generateKey(
-    { name: 'Ed25519' },
-    true,
-    ['sign', 'verify'],
-  );
-
-  const pubRaw = await subtle.exportKey('raw', keyPair.publicKey);
-  const privRaw = await subtle.exportKey('pkcs8', keyPair.privateKey);
-
+  const keyPair = nacl.sign.keyPair();
   return {
-    publicKey: Buffer.from(pubRaw as ArrayBuffer).toString('hex'),
-    privateKey: Buffer.from(privRaw as ArrayBuffer).toString('hex'),
+    publicKey: bytesToHex(keyPair.publicKey),
+    privateKey: bytesToHex(keyPair.secretKey),
   };
 }
 
 export async function sign(message: string, privateKeyHex: string): Promise<string> {
-  const keyData = Buffer.from(privateKeyHex, 'hex');
-  const privateKey = await subtle.importKey(
-    'pkcs8',
-    keyData,
-    { name: 'Ed25519' },
-    false,
-    ['sign'],
-  );
-
-  const msgBuffer = new TextEncoder().encode(message);
-  const sigBuffer = await subtle.sign('Ed25519', privateKey, msgBuffer);
-  return Buffer.from(sigBuffer).toString('hex');
+  const msgBytes = stringToBytes(message);
+  const privBytes = hexToBytes(privateKeyHex);
+  console.log('[crypto] sign - nacl:', typeof nacl, '| msgBytes:', Object.prototype.toString.call(msgBytes), msgBytes.length, '| privBytes:', Object.prototype.toString.call(privBytes), privBytes.length);
+  const signed = nacl.sign(msgBytes, privBytes);
+  return bytesToHex(signed.slice(0, nacl.sign.signatureLength));
 }
 
 export async function verify(
@@ -37,18 +38,13 @@ export async function verify(
   publicKeyHex: string,
 ): Promise<boolean> {
   try {
-    const keyData = Buffer.from(publicKeyHex, 'hex');
-    const publicKey = await subtle.importKey(
-      'raw',
-      keyData,
-      { name: 'Ed25519' },
-      false,
-      ['verify'],
-    );
-
-    const msgBuffer = new TextEncoder().encode(message);
-    const sigBuffer = Buffer.from(signatureHex, 'hex');
-    return subtle.verify('Ed25519', publicKey, sigBuffer, msgBuffer);
+    const msgBytes = stringToBytes(message);
+    const sigBytes = hexToBytes(signatureHex);
+    const pubBytes = hexToBytes(publicKeyHex);
+    const signedMsg = new Uint8Array(sigBytes.length + msgBytes.length);
+    signedMsg.set(sigBytes);
+    signedMsg.set(msgBytes, sigBytes.length);
+    return nacl.sign.open(signedMsg, pubBytes) !== null;
   } catch {
     return false;
   }

@@ -41,10 +41,11 @@ export function ComposeScreen() {
         signature,
         hops: 0,
       };
-      insertPost(post);
+      await insertPost(post);
       addPost(post);
       navigation.goBack();
     } catch (e) {
+      console.error('[Compose] handlePost failed:', e);
       Alert.alert('Erreur', 'Impossible de publier le post.');
     } finally {
       setLoading(false);

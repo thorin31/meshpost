@@ -54,10 +54,11 @@ export default function App() {
   const { user, setUser } = useStore();
 
   useEffect(() => {
-    initDB();
-    loadIdentity().then((identity) => {
-      if (identity) setUser(identity);
-    });
+    initDB().then(() =>
+      loadIdentity().then((identity) => {
+        if (identity) setUser(identity);
+      })
+    );
   }, [setUser]);
 
   return (

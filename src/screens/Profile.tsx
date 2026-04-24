@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useStore } from '@store/index';
 import { updateDisplayName } from '@modules/identity';
@@ -8,7 +8,11 @@ export function ProfileScreen() {
   const { user, setUser } = useStore();
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState(user?.display_name ?? '');
-  const postCount = getPostCount();
+  const [postCount, setPostCount] = useState(0);
+
+  useEffect(() => {
+    getPostCount().then(setPostCount);
+  }, []);
 
   async function handleSaveName() {
     if (!name.trim() || !user) return;
